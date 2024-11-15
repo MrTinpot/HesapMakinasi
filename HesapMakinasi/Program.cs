@@ -1,34 +1,34 @@
 ﻿using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace HesapMakinasi
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main(string[] args) 
         {
             string? sayi1s;
             string? sayi2s;
-            double sonuc = 0;
             bool dongu = true;
 
-            Console.ForegroundColor = ConsoleColor.Green;
+            Console.ForegroundColor = ConsoleColor.Green;            //Giriş
             Console.WriteLine("Hesap Makinasına hoşgeldiniz");
-            while (dongu==true)
+            while (dongu==true)                                     //Hesap makinasının işlem sonrası devamı için döngü
             {
-                Console.WriteLine("Sıra ile 2 sayı giriniz");
+                double sonuc = 0;
+                Console.WriteLine("Sıra ile 2 sayı giriniz");       //İlk sayı girişi
                 Console.WriteLine("1. sayıyı giriniz");
                 sayi1s = Console.ReadLine();
 
 
                 double sayi1 = 0;
-                while (!double.TryParse(sayi1s, out sayi1))
+                while (!double.TryParse(sayi1s, out sayi1))         //Girilen bilgilerin double'a dönüşebildiğinden emin olan loop
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Geçerli bir sayı girmediniz tekrar deneyiniz");
-                    Console.Beep();
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    sayi1s = Console.ReadLine();
+                    Console.WriteLine("Geçerli bir sayı girmediniz tekrar deneyiniz");  //While içerideki TryParse'ı çalıştırıyor                                                         
+                    Console.ForegroundColor = ConsoleColor.Green;                       //TryParse eğer dönüştürebilirse true dönüştüremezse false veriyor
+                    sayi1s = Console.ReadLine();                                        //(!) kullanarak false olduğu süre boyunca loop aktif kalıyor
                 }
 
 
@@ -40,7 +40,6 @@ namespace HesapMakinasi
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Geçerli bir sayı girmediniz tekrar deneyiniz");
-                    Console.Beep();
                     Console.ForegroundColor = ConsoleColor.Green;
                     sayi2s = Console.ReadLine();
                 }
@@ -48,27 +47,25 @@ namespace HesapMakinasi
 
                 bool islemdogru = false;
                 while (islemdogru == false) {
-                    Console.WriteLine("Yapmak istediğiniz işlem hangisidir\n\tToplama:+\n\tÇıkarma:-\n\tÇarpma:x,*\n\tBölme:/,÷\n\tYüzde:%");
-                    string? islemsembol;
-                    islemsembol = Console.ReadLine();
-                    if (islemsembol == null ||!Regex.IsMatch(islemsembol, @"^[+\-*/x÷%]$"))
+                    Console.WriteLine("Yapmak istediğiniz işlem hangisidir\n\tToplama:+\n\tÇıkarma:-\n\tÇarpma:x,*\n\tBölme:/,÷\n\tYüzde:%"); //Burası en zor kısımdı 
+                    string? islemsembol;  //Öncelikle direkt stringin birer char dizisi oluşundan sadece switch islemsembol[0] dan bulmaya çalışıyordum ama boş değer girilirse                                                                                                
+                    islemsembol = Console.ReadLine(); //Program exception veriyordu
+                    if (islemsembol == null ||!Regex.IsMatch(islemsembol, @"^[+\-*/x÷%]$")) //Biraz araştırdım bir stringi diğer stringe tam uyması durumunu Regex.IsMatch buldum Ama burada "-" karakteri sıkıntı çıkardı.Sonra \ koyarak bunu çözdüm
                     {
                         Console.ForegroundColor= ConsoleColor.Red;
                         Console.WriteLine("Bilinmeyen karakter");
-                        Console.Beep() ;
                         Console.ForegroundColor = ConsoleColor.Green;
                     }
                     else { 
-                        switch (islemsembol[0])
+                        switch (islemsembol[0])//Eskiden Kalmış bir kısımdı Değiştirmedim ama eğer değiştirilirse bütün caseler '' kullanmaktan "" geçirilmeli çünkü '' bir karakteri ifade ediyor
                         {
                             default:
                                 Console.ForegroundColor = ConsoleColor.Red;
                                 Console.WriteLine("İşlem Türü belirlenemedi");
-                                Console.Beep();
                                 Console.ForegroundColor = ConsoleColor.Green;
                                 break;
                             case '+':
-                                sonuc = Hesaplamalar.Toplama(sayi1, sayi2);
+                                sonuc = Hesaplamalar.Toplama(sayi1, sayi2);   //Burada switch case kısmınıda Hesaplamalar.cs ye bırakabilirdim ama burda yaparken debuglamak daha kolaydı
                                 break;
                             case '-':
                                 sonuc = Hesaplamalar.Cikarma(sayi1, sayi2);
@@ -86,9 +83,8 @@ namespace HesapMakinasi
                                 break;
                         }
                         if (double.IsNaN(sonuc)) { 
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("İşlemde bir hata oluştu"); 
-                            Console.Beep();
+                            Console.ForegroundColor = ConsoleColor.Red;    //Eğer unuttuğum bir bug bir belirisiz matematik sonucu olursu IsNan bulsun diye koydum
+                            Console.WriteLine("İşlemde bir hata oluştu");  //bütün bu kısmı try'a alıp herhangibir hatada catch exception yapılabilirmiş. StackOverFlow tavsiyesi--
                             Console.ForegroundColor = ConsoleColor.Green;
                         }
                         else
@@ -98,9 +94,10 @@ namespace HesapMakinasi
                         }
                     }
                 }
-                Console.WriteLine("\n\nKapatmak için 'k' basın ve enterlayın");
-                Console.WriteLine("Devam Etmek için sadece enterlayın");
-                if (Console.ReadLine() == "k") { dongu = false; }
+                Console.WriteLine("\n\nKapatmak için 'k' basın ve enterlayın");  //Evet burada sadece k kabul ediliyor Regex kullanarak daha fazla şey kabul edebilirdim
+                Console.WriteLine("Devam Etmek için sadece enterlayın");        //Ama gereksiz uzatırdı
+                //Console.WriteLine(GC.GetTotalMemory(false)); Uygulama 196.76kb kullanıyor daha iyi optimize edilebilir galiba...
+                if (Console.ReadLine() == "k") { dongu = false; }             
             }
         }
     }

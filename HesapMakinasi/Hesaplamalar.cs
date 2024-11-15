@@ -25,7 +25,6 @@ namespace HesapMakinasi
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("0 Sayısı başka bir sayıya bölünemez lütfen başka sayı giriniz.");
-                            Console.Beep();
                             Console.ForegroundColor = ConsoleColor.Green;
                             sayi2s = Console.ReadLine();
                         }
